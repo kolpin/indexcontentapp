@@ -1,0 +1,148 @@
+<h1>Index the content</h1>
+
+<ul class="tabs">
+  <li class="active">
+    <a href="#tab__parse-link">Parse link</a>
+  </li>
+  <li>
+    <a href="#tab__already-links">Already indexed links</a>
+  </li>
+</ul>
+
+<div class="tab tab__active" id="tab__parse-link">
+  <h2>Parse link</h2>
+  <form action="/rest/index" id="index-url-form">
+    <label for="page_url">Url for index:</label>  <input type="text" name="url" id="page_url" placeholder="Enter url..." /> <button type="submit">Index</button>
+    <div id="index-result-error" class="error-message"></div>
+    <div id="index-result" style="display: none">
+      <div class="section-title">Page headers:</div>
+      <div id="index-headers" class="section-content">
+
+      </div>
+      <div class="section-title">Page urls:</div>
+      <div id="index-urls" class="section-content">
+
+      </div>
+      <div class="section-title">Page content text:</div>
+      <div id="index-content" class="section-content">
+
+      </div>
+    </div>
+  </form>
+</div>
+<div class="tab" id="tab__already-links">
+  <h2>Already indexed links</h2>
+  <form action="/rest/list" id="list-url-form">
+    <button type="submit">Get links</button>
+    <div id="links-result-error" class="error-message"></div>
+    <div id="links-result" style="display: none">
+      <div class="section-title">Links urls:</div>
+      <div id="links-content" class="section-content">
+
+      </div>
+    </div>
+  </form>
+</div>
+
+
+
+<script type="text/javascript">
+  $(function () {
+
+    $('.tabs').on('click', 'a', function (e) {
+      e.preventDefault();
+      $('.tabs li').removeClass('active');
+      var tabId = $(this).attr('href');
+      $(this).parent().addClass('active');
+      $('.tab').removeClass('tab__active');
+      $(tabId).addClass('tab__active');
+    });
+
+
+    var parseProcess = null;
+
+    $('#index-url-form').on('submit', function (e) {
+      e.preventDefault();
+      var form = $(this),
+          requestUrl = form.attr('action'),
+          url = $('#page_url').val(),
+          errorMessage = $('#index-result-error'),
+          resultMessage = $('#index-result'),
+          resultHeaders = $('#index-headers'),
+          resultUrls = $('#index-urls'),
+          resultContent = $('#index-content');
+
+      try{
+        parseProcess.abort();
+      }catch (e){}
+
+      parseProcess = $.get(requestUrl, {url: url}, function (result) {
+
+        if(result.status == 'ok'){
+          errorMessage.text('').hide();
+          resultContent.html('<pre>'+result.link_content.content+'</pre>');
+
+          resultHeaders.html('');
+          if(result.link_content.headers.length > 0){
+            for(var key in result.link_content.headers){
+              var header =  result.link_content.headers[key];
+              resultHeaders.append('<div>' + header + '</div>')
+            }
+          }else{
+            resultHeaders.html('No headers');
+          }
+
+          resultUrls.html('');
+          if(result.link_content.links.length > 0){
+            for(var key2 in result.link_content.links){
+              var header =  result.link_content.links[key2];
+              resultUrls.append('<div>' + header + '</div>')
+            }
+          }else{
+            resultUrls.html('No links');
+          }
+
+          resultMessage.show();
+        }else{
+          errorMessage.text(result.message).show();
+          resultMessage.hide();
+        }
+      });
+    });
+
+    $('#list-url-form').on('submit', function (e) {
+      e.preventDefault();
+      var form = $(this),
+          requestUrl = form.attr('action'),
+          errorMessage = $('#links-result-error'),
+          linksResult = $('#links-result'),
+          linksContent = $('#links-content');
+
+      try{
+        parseProcess.abort();
+      }catch (e){}
+
+      parseProcess = $.get(requestUrl, function (result) {
+        console.log(result);
+        if(result.status == 'ok'){
+          errorMessage.text("").hide();
+          linksContent.html('');
+          if(result.url_list.length > 0){
+            for(var key in result.url_list){
+              var link_url = result.url_list[key];
+              linksContent.append('<div><a href="'+link_url+'" target="_blank">'+link_url+'</a></div>');
+            }
+          }else{
+            linksContent.html('No links');
+          }
+
+          linksResult.show();
+        }else{
+          errorMessage.text(result.message).show();
+          linksResult.hide();
+        }
+      });
+    });
+
+  });
+</script>

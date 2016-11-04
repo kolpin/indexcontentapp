@@ -1,0 +1,103 @@
+@mixin clearfix() {
+  &:before,
+  &:after {
+    content: "";
+    display: table;
+  }
+  &:after {
+    clear: both;
+  }
+}
+
+body{
+  font-family: Arial, sans-serif;
+}
+
+label{
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+input{
+  padding: 5px 5px;
+  border-radius: 3px;
+  border: 1px solid green;
+  width: 250px;
+  background: rgba(0, 253, 0, 0.16);
+}
+
+button{
+  padding: 4px 15px;
+  border-radius: 3px;
+  background: green;
+  color: #fff;
+  border: 1px solid #006400;
+}
+
+a{
+  color: green;
+}
+
+.content-wrapper{
+  position: relative;
+}
+
+.content{
+  position: relative;
+  width: 1000px;
+  margin: 0 auto;
+}
+
+.tabs{
+  display: block;
+  list-style: none;
+  margin: 20px 0;
+  border-bottom: 1px solid green;
+  @include clearfix();
+  li{
+    display: block;
+    float: left;
+    padding: 0;
+    margin: 0;
+    a{
+      display: block;
+      padding: 10px 20px;
+      text-decoration: none;
+      color: green;
+    }
+
+    &.active{
+      a{
+        border: 1px solid green;
+        border-bottom-color: transparent;
+        color: #fff;
+        background: green;
+      }
+    }
+  }
+}
+
+.tab{
+  display: none;
+  &.tab__active{
+    display: block;
+  }
+}
+
+
+.section-title{
+  font-weight: bold;
+  margin: 15px;
+}
+
+.section-content{
+  padding: 15px;
+  border: 1px solid green;
+  border-radius: 3px;
+}
+
+.error-message{
+  margin: 10px 0;
+  font-size: 12px;
+  color: red;
+}
